@@ -5,7 +5,11 @@
 
 [http://det1re.de/a/sneek/sneek_div.png]
 = I just get a black screen (no DIOS MIOS splash screen) =
-Chances are high that your USB2IDE device isn't supported, try another USB2IDE device or wait for an update.
+Chances are high that your USB2IDE device isn't supported.
+ * Assure that your HDD is formatted with FAT32, no other FS is supported.
+ * Only cluster sizes 32KB or less are supported.
+ * The FAT32 partition MUST be the first primaly partition on the HDD, otherwise it will not work.
+ * If all the above are ok try another USB2IDE device or wait for an update.
 
 [http://det1re.de/a/sneek/sneek_div.png]
 = I just get a black screen AFTER the DIOS MIOS splash screen =
