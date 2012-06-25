@@ -1,4 +1,4 @@
-#summary This page has a list of games that have issues or require fixing to work on DML
+#summary This page has a list of games that have issues or require fixing to work on DIOS MIOS
 #labels Featured
 
 
@@ -23,6 +23,8 @@
 || The Legend of Zelda Collector's Edition || Unknown ||
 || The Legend of Zelda OoT/Master Quest || Unknown ||
 || AUS Multi Game Demo Disc 3 || Unknown ||
+|| Metroid Prime 2: Echoes Bonus Disc  || Unknown ||
+|| Star Wars Rebel Strike Preview Disc  || Unknown ||
  
 Probably all games that use TGCs.
 
