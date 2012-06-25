@@ -46,9 +46,13 @@ This means DM was unable to mount the selected ISO for whatever reason.
 
 
 [http://det1re.de/a/sneek/sneek_div.png]
-= Will NTFS ever be support? =
+= Will NTFS ever be supported? =
  * No, it would also take way more space than there is available. Just so you know libNTFS for Wii/GC is about 500KB, total memory DM can use is 96KB and almost everything is already used up.
 
 [http://det1re.de/a/sneek/sneek_div.png]
-= Will WBFS ever be support? =
+= Will the Wiimote/Classic Controller ever be supported? =
+ * No, this would require a complete SDIO/BlueTooth/Wiimote lib, which would also take up way more space than available. (BT+Wiimote lib in libOGC are ~600KB).
+
+[http://det1re.de/a/sneek/sneek_div.png]
+= Will WBFS ever be supported? =
 HAHA nice joke.
