@@ -44,6 +44,9 @@ This means DM was unable to mount the selected ISO for whatever reason.
  * In short NMM isn't supported for that game.
  * This means a fatal error occurred in the NMM code and it could no longer assure stable program execution.
 
+[http://det1re.de/a/sneek/sneek_div.png]
+= NoDisc patch doesn't work =
+ * It seems many loaders havn't caught up yet since NoDisc is no longer controlled via the config but instead just but either having a disc in the drive or not.
 
 [http://det1re.de/a/sneek/sneek_div.png]
 = Will NTFS ever be supported? =
