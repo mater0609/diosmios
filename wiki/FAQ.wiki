@@ -34,6 +34,13 @@ This usually can have three reasons:
  * The game tried to switch from one video mode to another, usually happens when loading USA games on EUR systems or vice versa.
 
 [http://det1re.de/a/sneek/sneek_div.png]
+= I get "Fatal error app_main:dst not in MEM1!" =
+GCLoader got incorrect data when reading from the ISO
+ * Verify that your HDD is using 32KB cluster size or less, this error can happen with 64KB cluster size.
+ * Verify that your dump is ok, just google for the md5 hash.
+ * Try to install the game again (delete the old folder before)
+
+[http://det1re.de/a/sneek/sneek_div.png]
 = I get "Fatal error apploader size is zero!" =
 This means DM was unable to mount the selected ISO for whatever reason.
  * Verify that your dump is ok, just google for the md5 hash.
