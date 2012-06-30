@@ -40,6 +40,14 @@ This means DM was unable to mount the selected ISO for whatever reason.
  * Try to install the game again (delete the old folder before)
 
 [http://det1re.de/a/sneek/sneek_div.png]
+= I get "Fatal error entrypoint is not within MEM1!" =
+This means the apploader could not load the main.dol
+ * Verify that your dump is ok, just google for the md5 hash.
+ * If you used GCReEX or DiscEX -c try DiscEX without -c to install the game as some games might break if you modify them
+ * Try to install the game again (delete the old folder before)
+
+
+[http://det1re.de/a/sneek/sneek_div.png]
 = My system shuts down when using NMM while loading/saving =
  * In short NMM isn't supported for that game.
  * This means a fatal error occurred in the NMM code and it could no longer assure stable program execution.
