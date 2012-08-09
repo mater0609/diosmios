@@ -47,7 +47,6 @@ typedef struct
 } usbstorage_handle;
 
 s32 USBStorage_Initialize(void);
-void switchbuf(void);
 
 s32 USBStorage_Open(usbstorage_handle *dev, struct ehci_device *fd);
 s32 USBStorage_Close(usbstorage_handle *dev);

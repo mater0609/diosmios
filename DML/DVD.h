@@ -6,7 +6,6 @@
 #include "Config.h"
 #include "ff.h"
 #include "dol.h"
-#include "Drive.h"
 
 typedef struct
 {
@@ -17,11 +16,8 @@ typedef struct
 	u8		GameInfo[][0x80];
 } DVDConfig;
 
-void DVDInit( void );
-void DVDReadConfig( void );
-s32 DVDSelectGame( void );
-void DVDUpdateFSTRAM( void );
-void DiscBackup( u32 FrameBuffer );
+void	DVDReadConfig( void );
+s32		DVDSelectGame( void );
 
 u32		FSTInit( void );
 void	FSTRead( char *Buffer, u32 Length, u32 Offset );

@@ -57,6 +57,7 @@ void CardInit( void )
 
 	write32( 0x2FA0, 0 );
 }
+
 s32 CardFindFreeEntry( void )
 {
 	CARDStat CStat;
@@ -144,7 +145,7 @@ s32 CardFastOpenFile( u32 FileNo, CARDFileInfo *CFInfo )
 {
 	CARDStat CStat;
 	FIL savefile;
-	s32 fres;
+	s32 Slot,fres;
 	u32 read;
 
 	if( FileNo >= CARD_MAX_FILES )
@@ -505,10 +506,9 @@ void CardUpdateStats( CARDStat *CStat )
 
 	CStat->offsetData = Offset;
 }
-u32 Device = 0;
 void CARDUpdateRegisters( void )
 {
-	u32 read;
+	u32 read,i;
 
 	if( read32(CARD_CONTROL) != 0xdeadbeef )
 	{
@@ -524,20 +524,17 @@ void CARDUpdateRegisters( void )
 
 		write32( CARD_CONTROL, 0xdeadbeef );
 		
-#ifdef ACTIVITYLED
-		set32( HW_GPIO_OUT, 1<<5 );
-#endif
+		if( ConfigGetConfig(DML_CFG_ACTIVITY_LED) )
+			set32( HW_GPIO_OUT, 1<<5 );
 
 		while( read32(CARD_CMD) == 0xdeadbeef );
 		write32( CARD_SCMD, read32(CARD_CMD) );
 		write32( CARD_CMD, 0xdeadbeef );
-		
-		if( read32(CARD_CMD_1) != 0xdeadbeef )
-		{
-			write32( CARD_SCMD_1, read32(CARD_CMD_1) );
-			write32( CARD_CMD_1, 0xdeadbeef );
-		}
 
+		while( read32(CARD_CMD_1) == 0xdeadbeef );
+		write32( CARD_SCMD_1, read32(CARD_CMD_1) );
+		write32( CARD_CMD_1, 0xdeadbeef );
+		
 		if( read32(CARD_CMD_2) != 0xdeadbeef )
 		{
 			write32( CARD_SCMD_2, read32(CARD_CMD_2) );
@@ -565,12 +562,9 @@ void CARDUpdateRegisters( void )
 			default:
 			{
 				//EXIControl(1);
-
 				dbgprintf("CARD:Unknown CMD:%08X %08X %08X %08X %08X %08X\n", read32(CARD_SCMD), read32(CARD_SCMD_1), read32(CARD_SCMD_2), read32(CARD_SCMD_3), read32(CARD_SCMD_4), read32(CARD_SCONTROL) );
-
 				Shutdown();
 			} break;
-
 			/* CARDOpen( char *FileName ) */
 			case 0xC0:
 			{
@@ -942,8 +936,8 @@ void CARDUpdateRegisters( void )
 #endif
 			} break;
 		}
-#ifdef ACTIVITYLED
-		clear32( HW_GPIO_OUT, 1<<5 );
-#endif
+
+		if( ConfigGetConfig(DML_CFG_ACTIVITY_LED) )
+			clear32( HW_GPIO_OUT, 1<<5 );
 	}
 }

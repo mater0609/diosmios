@@ -4,7 +4,7 @@ DML_CFG *DMLCfg;
 
 void ConfigInit( DML_CFG *Cfg )
 {
-	DMLCfg = (DML_CFG*)0xFFFE4200;
+	DMLCfg = (DML_CFG*)malloc( sizeof( DML_CFG ) );
 
 	memset32( DMLCfg, 0, sizeof(DML_CFG) );
 
@@ -15,7 +15,7 @@ void ConfigInit( DML_CFG *Cfg )
 
 	} else {
 
-		dbgprintf("No config found in RAM\n");
+		dbgprintf("No valid found in RAM\n");
 		dbgprintf("Version:%08X\n", DMLCfg->Version );
 		dbgprintf("Config:%08X\n", DMLCfg->Config );
 		

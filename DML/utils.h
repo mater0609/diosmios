@@ -182,13 +182,6 @@ static inline u32 get_cpsr(void)
 	return data;
 }
 
-#define STACK_ALIGN(type, name, cnt, alignment)         \
-u8 _al__##name[((sizeof(type)*(cnt)) + (alignment) + \
-(((sizeof(type)*(cnt))%(alignment)) > 0 ? ((alignment) - \
-((sizeof(type)*(cnt))%(alignment))) : 0))]; \
-type *name = (type*)(((u32)(_al__##name)) + ((alignment) - (( \
-(u32)(_al__##name))&((alignment)-1))))
-
 #define swab32(x) ((u32)(                                     \
                                    (((u32)(x) & (u32)0x000000ffUL) << 24) | \
                                    (((u32)(x) & (u32)0x0000ff00UL) <<  8) | \

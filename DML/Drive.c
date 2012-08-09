@@ -73,35 +73,6 @@ u32 LowReadDiscID( void *data )
 	
 	return 0;
 }
-u32 LowRead( void *data, u32 Offset, u32 Length )
-{	
-	write32( 0x0D806008, 0xA8000000 );
-	write32( 0x0D80600C, Offset>>2 );
-	write32( 0x0D806010, Length );
-	write32( 0x0D806018, Length );
-	
-	write32( 0x0D806014, (u32)data );
-
-	write32( 0x0D806000, 0x3A );
-	
-	write32( 0x0D80601C, 3 );
-	
-	while (1)
-	{
-		if( read32( 0x0D806000 ) & (1<<2) )
-		{
-			set32( 0x0D806000, (1<<2) );
-			return 1;
-		}
-		if( read32( 0x0D806000 ) & (1<<4) )
-		{
-			set32( 0x0D806000, (1<<4) );
-			return 0;
-		}
-	}
-	
-	return 0;
-}
 u32 DVDEnableAudioStreaming( u32 Enable )
 {
 	write32( 0x0D806004, read32( 0x0D806004 ) );

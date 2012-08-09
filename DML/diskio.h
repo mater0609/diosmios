@@ -1,31 +1,14 @@
 /*-----------------------------------------------------------------------
-/  Low level disk interface modlue include file  R0.07   (C)ChaN, 2009
-/-----------------------------------------------------------------------
-/ FatFs module is an open source project to implement FAT file system to small
-/ embedded systems. It is opened for education, research and development under
-/ license policy of following trems.
-/
-/  Copyright (C) 2009, ChaN, all right reserved.
-/
-/ * The FatFs module is a free software and there is no warranty.
-/ * You can use, modify and/or redistribute it for personal, non-profit or
-/   commercial use without any restriction under your responsibility.
-/ * Redistributions of source code must retain the above copyright notice.
-/
-/----------------------------------------------------------------------------*/
-// original source: http://elm-chan.org/fsw/ff/00index_e.html
+/  Low level disk interface modlue include file
+/-----------------------------------------------------------------------*/
 
 #ifndef _DISKIO
 
-#define _READONLY	0	/* 1: Read-only mode */
-#define _USE_IOCTL	1
+#define _READONLY	0	/* 1: Remove write functions */
+#define _USE_IOCTL	1	/* 1: Use disk_ioctl fucntion */
 
 #include "integer.h"
-#include "string.h"
-#include "ehci.h"
-#include "alloc.h"
-#include "tiny_ehci_glue.h"
-#include "dip.h"
+
 
 /* Status of Disk Functions */
 typedef BYTE	DSTATUS;
@@ -43,15 +26,15 @@ typedef enum {
 /*---------------------------------------*/
 /* Prototypes for disk control functions */
 
+int assign_drives (int, int);
 DSTATUS disk_initialize (BYTE);
 DSTATUS disk_status (BYTE);
 DRESULT disk_read (BYTE, BYTE*, DWORD, BYTE);
 #if	_READONLY == 0
 DRESULT disk_write (BYTE, const BYTE*, DWORD, BYTE);
 #endif
-#if     _USE_IOCTL == 1
 DRESULT disk_ioctl (BYTE, BYTE, void*);
-#endif
+
 
 
 /* Disk Status Bits (DSTATUS) */
@@ -61,10 +44,35 @@ DRESULT disk_ioctl (BYTE, BYTE, void*);
 #define STA_PROTECT		0x04	/* Write protected */
 
 
-#if _USE_IOCTL == 1
-/* Command code for disk_ioctl() */
-#define CTRL_SYNC	0	/* Mandatory for write functions */
-#endif
+/* Command code for disk_ioctrl fucntion */
+
+/* Generic command (defined for FatFs) */
+#define CTRL_SYNC			0	/* Flush disk cache (for write functions) */
+#define GET_SECTOR_COUNT	1	/* Get media size (for only f_mkfs()) */
+#define GET_SECTOR_SIZE		2	/* Get sector size (for multiple sector size (_MAX_SS >= 1024)) */
+#define GET_BLOCK_SIZE		3	/* Get erase block size (for only f_mkfs()) */
+#define CTRL_ERASE_SECTOR	4	/* Force erased a block of sectors (for only _USE_ERASE) */
+
+/* Generic command */
+#define CTRL_POWER			5	/* Get/Set power status */
+#define CTRL_LOCK			6	/* Lock/Unlock media removal */
+#define CTRL_EJECT			7	/* Eject media */
+
+/* MMC/SDC specific ioctl command */
+#define MMC_GET_TYPE		10	/* Get card type */
+#define MMC_GET_CSD			11	/* Get CSD */
+#define MMC_GET_CID			12	/* Get CID */
+#define MMC_GET_OCR			13	/* Get OCR */
+#define MMC_GET_SDSTAT		14	/* Get SD status */
+
+/* ATA/CF specific ioctl command */
+#define ATA_GET_REV			20	/* Get F/W revision */
+#define ATA_GET_MODEL		21	/* Get model name */
+#define ATA_GET_SN			22	/* Get serial number */
+
+/* NAND specific ioctl command */
+#define NAND_FORMAT			30	/* Create physical format */
+
 
 #define _DISKIO
 #endif

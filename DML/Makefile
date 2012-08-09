@@ -9,21 +9,20 @@ CFLAGS +=	-fno-builtin-memcpy -fno-builtin-memset -fno-builtin-toupper -fno-buil
 
 ASFLAGS	=	-mbig-endian -mcpu=arm926ej-s
 
-LDFLAGS	=	-nostartfiles -nodefaultlibs -mbig-endian -Wl,-T,iosmodule.ld,-Map,iosmodule.map -n
+LDFLAGS	=	-nostartfiles -nodefaultlibs -mbig-endian -Wl,-T,diosmioslite.ld,-Map,diosmioslite.map -n
 
 LIBS	=	-lgcc
 
-TARGET	=	iosmodule.elf
-OBJECTS	=	start.o utils_asm.o HW.o Card.o memory.o memory_asm.o Config.o common.o ff.o diskio.o alloc.o Drive.o DVD.o dip.o Patches.o main.o vsprintf.o string.o tiny_ehci_glue.o usb_os.o
+TARGET	=	diosmioslite.elf
+OBJECTS	=	start.o utils_asm.o HW.o Card.o memory.o memory_asm.o Config.o common.o sdhc.o ff.o sdmmc.o diskio.o alloc.o Drive.o DVD.o dip.o Patches.o main.o vsprintf.o string.o 
 .PHONY: FORCE
 
 all: $(TARGET)
 
-$(TARGET) : iosmodule.ld $(OBJECTS)
+$(TARGET) : diosmioslite.ld $(OBJECTS)
 	@echo  "LD	$@"
 	@$(LD) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
-	@echo $(SSTRIP) -s $@
-
+	@$(SSTRIP) -s $@
 
 %.o : %.s
 	@echo  "AS	$@"
@@ -47,7 +46,9 @@ $(TARGET) : iosmodule.ld $(OBJECTS)
 	@echo	"DEP	$@"
 	@touch $@
 
+ifneq ($(MAKECMDGOALS),clean)
 -include $(OBJECTS:.o=.d)
+endif
 
 clean:
 	-rm -f *.elf *.o *.bin *.d *.map

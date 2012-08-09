@@ -13,7 +13,6 @@
 #include "Config.h"
 #include "DVD.h"
 #include "elf.h"
-#include "usbstorage.h"
 
 enum opcodes
 {

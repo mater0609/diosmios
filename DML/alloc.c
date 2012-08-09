@@ -1,43 +1,36 @@
 #include "alloc.h"
 #include "vsprintf.h"
 
-u8 *RAM;//[_AHEAP_SIZE_TOTAL];
-HeapInfoEntry *HeapInfoEntries=(HeapInfoEntry *)NULL;
+u8 *RAM;
+HeapInfoEntry *HeapInfoEntries=NULL;
 
 extern u32 DRAMRead( u32 a );
 extern void DRAMWrite( u32 a, u32 b );
 
-void HeapInit( u8 *Offset )
+void HeapInit( void )
 {
-	//RAM = (u8*)0xFFFE4000;
-	//RAM = (u8*)0x13600000;
-	//RAM = (u8*)0x00600000;
-
-	RAM = Offset;
-
+	RAM = (u8*)0xFFFE4000;
 	HeapInfoEntries = (HeapInfoEntry*)(RAM+_AHEAP_SIZE);
 	memset32( HeapInfoEntries, 0, _AHEAP_INFO_SIZE );
 
 	while( HeapInfoEntries[0].Offset != 0 )
 	{
-		EXIControl(1);
-		dbgprintf("Alloc:Failed to clear memory!:%08X", HeapInfoEntries[0].Offset );
+		dbgprintf("Failed to clear memory!");
 		Shutdown();
 	}
 
-//	dbgprintf("Cleared 0x%04X bytes Space for %d allocs\n", _AHEAP_INFO_SIZE, _AHEAP_INFO_SIZE / 8 );	
-
+	//dbgprintf("Cleared 0x%04X bytes Space for %d allocs\n", _AHEAP_INFO_SIZE, _AHEAP_INFO_SIZE / 8 );	
 }
-void *malloc( u32 _size )
+void *malloc( u32 size )
 {
-	if( _size == 0 )
+	if( size == 0 )
 		return NULL;
 
-	if( _size > _AHEAP_SIZE )
+	if( size > _AHEAP_SIZE )
 		return NULL;
 
-	//align size to 32, easy cheat toallow all allocs to be aligned easily
-	u32 size = (_size+0x1F) & (~0x1F);
+	//align size to 32, easy cheat to allow all allocs to be aligned easily
+	size = (size+0x1F) & (~0x1F);
 
 	//find a free entry to be used
 	u32 entry = 0xdeadbeef;
@@ -51,16 +44,14 @@ void *malloc( u32 _size )
 			break;
 		}
 	}
-
 	if( entry == 0xdeadbeef )
 	{
-		EXIControl(1);
-		dbgprintf("Alloc: run out of entries!\n");
-		while(1);
+		dbgprintf("run out of entries!\n");
+		return NULL;
 	}
 
-	//dbgprintf("Alloc:Using entry:%d to alloc %u(%u) bytes...\n", entry, size, _size );
-	
+	//dbgprintf("Using entry:%d to alloc %d bytes...\n", entry, size );
+
 	//Now we search a used entry
 	u32 used_entry = 0xdeadbeef;
 
@@ -177,7 +168,7 @@ find_space:
 	if( used_entry != 0xdeadbeef )
 		goto find_space;
 
-	dbgprintf("Alloc:failed to alloc %d bytes\n", size );
+	dbgprintf("failed to alloc %d bytes\n", size  );
 
 	return NULL;
 }

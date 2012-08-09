@@ -37,6 +37,7 @@ char *getfilenamebyoffset(u32 offset)
 	return (char*)NULL;
 }
 
+
 void DIInit( void )
 {
 	memset32( (void*)DI_BASE, 0xdeadbeef, 0x30 );
@@ -44,8 +45,6 @@ void DIInit( void )
 
 	write32( DI_SCONFIG, 0xFF );
 	write32( DI_SCOVER, 0 );
-
-	write32( HW_TIMER, 0 );
 }
 u32 DIUpdateRegisters( void )
 {	
@@ -53,7 +52,7 @@ u32 DIUpdateRegisters( void )
 	static u32 PatchState	= 0;
 	static u32 DOLReadSize	= 0;
 	static u32 PSOHack		= 0;
-	
+
 	if( read32(DI_CONTROL) != 0xdeadbeef )
 	{
 		write32( DI_SCONTROL, read32(DI_CONTROL) & 3 );
@@ -102,7 +101,7 @@ u32 DIUpdateRegisters( void )
 				write32( DI_SIMM, read32(DI_IMM) );
 				write32( DI_IMM, 0xdeadbeef );
 			}
-
+			
 			switch( read32(DI_SCMD_0) >> 24 )
 			{
 				case 0xA7:
@@ -328,13 +327,6 @@ u32 DIUpdateRegisters( void )
 		} else {
 			;//dbgprintf("DIP:DI_CONTROL:%08X:%08X\n", read32(DI_CONTROL), read32(DI_CONTROL) );
 		}
-	}
-
-	if( (u64)read32(HW_TIMER) >= 2 * 60 * 243000000LL / 128 )
-	{
-		USBStorage_Read_Sectors( 23, 1, (void*)0x1000 );
-
-		write32( HW_TIMER, 0 );
 	}
 
 	return 0;

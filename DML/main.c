@@ -1,6 +1,6 @@
 /*
 
-DIOS MIOS - Gamecube USB loader for Nintendo Wii
+DIOS MIOS Lite - Gamecube SD loader for Nintendo Wii
 
 Copyright (C) 2010-2012  crediar
 
@@ -17,30 +17,28 @@ Copyright (C) 2010-2012  crediar
 #include "Patches.h"
 #include "Config.h"
 #include "Card.h"
+#include "sdhc.h"
 #include "DVD.h"
 #include "Drive.h"
 #include "dip.h"
+
 
 char __aeabi_unwind_cpp_pr0[0];
 
 void Syscall( u32 a, u32 b, u32 c, u32 d )
 {
-	dbgprintf("Syscall,%d,%d,%d,%d\n", a, b, c, d);
+	//dbgprintf("Syscall,%d,%d,%d,%d\n", a, b, c, d);
 	return;
 }
 void SWI( u32 a, u32 b )
 {
-	dbgprintf("SWI:%X,%X\n", a, b );
+	//dbgprintf("SWI:%X,%X\n", a, b );
 	return;
 }
 void PrefetchAbort( void )
 {
-	u32 val;
-	__asm("mov	%0,lr": "=r" (val) );
-	
-	*(vu32*)0xD800070 |= 1;
-
-	dbgprintf("PrefetchAbort LR:%08x\n", val-8 );
+	EXIControl(1);
+	dbgprintf("PrefetchAbort\n");
 	while(1);
 	return;
 }
@@ -52,13 +50,13 @@ void DataAbort( u32 a, u32 b, u32 c, u32 d, u32 e, u32 f, u32 g, u32 h )
 
 	*(vu32*)0xD800070 |= 1;
 	
-	dbgprintf("DataAbort: LR:%08x, %x, %x, %x, %x, %x, %x, %x\n",val-8,b,c,d,e,f,g,h);
+	dbgprintf("DataAbort: LR:%08x, %x, %x, %x, %x, %x, %x, %x\n",val,b,c,d,e,f,g,h);
 	Shutdown();
 }
 void IRQHandler( void )
 {
 	u32 IRQs = read32(HW_ARMIRQFLAG) /*& read32(HW_ARMIRQMASK)*/;
-
+	
 	if( IRQs & IRQ_GPIO1 )	// Starlet GPIO IRQ
 	{
 		if( read32(HW_GPIO_INTFLAG) & (1) )
@@ -85,17 +83,11 @@ void IRQHandler( void )
 
 			while(1);
 		}
-	} else if( IRQs & IRQ_RESET )
-	{
-		;
-	} else {
-		
-		set32( HW_EXICTRL, 1 );
-
-		udelay(1000);
-		dbgprintf("IRQ:%08X %08X\n", read32(HW_ARMIRQFLAG), read32(HW_GPIO_INTFLAG) );
-		set32( HW_EXICTRL, 0 );
 	}
+
+	//Clear IRQ Flags
+	write32( HW_ARMIRQFLAG, read32(HW_ARMIRQFLAG) );
+	write32( HW_GPIO_INTFLAG, read32(HW_GPIO_INTFLAG) );
 
 	return;
 }
@@ -122,9 +114,13 @@ void SysShutdown( void )
 }
 
 u32 fail;
+FIL Log;
 
 int main( int argc, char *argv[] )
 {
+	FATFS fatfs;
+	s32 fres = 0;
+
 	udelay(800);
 
 #ifndef REALNAND	
@@ -158,53 +154,41 @@ int main( int argc, char *argv[] )
 	MIOSInit();
 
 #ifdef DEBUG
-	dbgprintf("DIOS-MIOS [DEBUG] v%d.%d\n", DM_VERSION>>16, DM_VERSION & 0xFFFF );
+	dbgprintf("DIOS-MIOS Lite [DEBUG] v%d.%d\n", DML_VERSION>>16, DML_VERSION & 0xFFFF );
 #else
 #ifdef REALNAND
-	dbgprintf("DIOS-MIOS v%d.%db\n", DM_VERSION>>16, DM_VERSION & 0xFFFF );
+	dbgprintf("DIOS-MIOS Lite v%d.%db\n", DML_VERSION>>16, DML_VERSION & 0xFFFF );
 #else
-	dbgprintf("DIOS-MIOS v%d.%da\n", DM_VERSION>>16, DM_VERSION & 0xFFFF );
+	dbgprintf("DIOS-MIOS Lite v%d.%da\n", DML_VERSION>>16, DML_VERSION & 0xFFFF );
 #endif
 #endif
 	dbgprintf("Built: " __DATE__ " " __TIME__ "\n");
-	dbgprintf("This software is licensed under GPLv3, for more details visit:\nhttp://code.google.com/p/diosmios\n");
-
-	//dbgprintf("CPU Ver:%d.%d\n", SP[1], SP[0] );
+	dbgprintf("This software is licensed under GPLv3, for more details visit:\nhttp://code.google.com/p/diosmioslite\n");
 	
 	//dbgprintf("MEMInitLow()...\n");
 	MEMInitLow();
 	
-//	EHCI
-
-	*(vu32*)0x0D0400A4 = 0x00004026;
-	*(vu32*)0x0D0400B0 = 0x0002422E;
-	*(vu32*)0x0D0400B4 = 0x03802E14;
-
-// DDR control
-
-	*(vu16*)0x0D8B4034 = 0x0000;
-	*(vu16*)0x0D8B403C = 0x0000;
-	*(vu16*)0x0D8B4034 = 0x0000;
-	*(vu16*)0x0D8B403C = 0x0000;
-	*(vu16*)0x0D8B4040 = 0x0000;
-	*(vu16*)0x0D8B4044 = 0x0000;
-	*(vu16*)0x0D8B4048 = 0x0000;
-	*(vu16*)0x0D8B404C = 0x0000;
-	*(vu16*)0x0D8B4050 = 0x0000;
-	*(vu16*)0x0D8B4054 = 0x13EB;
-	*(vu16*)0x0D8B4058 = 0x09B5;
-	*(vu16*)0x0D8B4060 = 0x0000;
-	*(vu16*)0x0D8B4064 = 0x0000;
-	*(vu16*)0x0D8B420C = 0x3620;
-	*(vu16*)0x0D8B4220 = 0xF000;
-
+	//EHCIInit();
+	//dbgprintf("EHCIInit()\n");
+	
 	udelay(8000);
 	
-	HeapInit( (u8*)0x13600000 );
-	
-	set32( HW_EXICTRL, 1 );
+	HeapInit();
+	//dbgprintf("HeapInit()\n");
+			
+	sdhc_init();
 
-	DVDInit();
+	//dbgprintf("f_mount()");
+	fres = f_mount(0, &fatfs );
+	//dbgprintf(":%d\n", fres );
+	
+	if( fres != FR_OK )
+	{
+		dbgprintf("Error: Could not mount fatfs, ret: %d\n", fres);
+		Shutdown();
+	}
+
+	set32( HW_EXICTRL, 1 );
 
 	ConfigInit( (DML_CFG*)0x01200000 );
 
@@ -226,22 +210,11 @@ int main( int argc, char *argv[] )
 
 	DIInit();
 	
-//Switch mem2 to ARAM
-	DRAMCTRLWrite( 0x49, 0x0E );
-	udelay(2);
-
-	DRAMCTRLWrite( 0x49, 0x0F );
-	udelay(2);
-
-	HeapInit( (u8*)0xFFFE5000 );
-
 	write32( HW_PPCIRQFLAG, read32(HW_PPCIRQFLAG) );
 	write32( HW_ARMIRQFLAG, read32(HW_ARMIRQFLAG) );
 	
 	set32( HW_PPCIRQMASK, (1<<31) );
 	set32( HW_IPC_PPCCTRL, 0x30 );
-
-	write32( 0x0D806008, 0 );
 	
 	EXIControl(0);
 

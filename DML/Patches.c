@@ -148,7 +148,7 @@ FuncPattern FPatterns[] =
 	{ 0x3B0,        87,     13,     27,     17,     25,	(u8*)NULL,					0xdead000B,						"PADRead C",					2,		0 },
 	{ 0x334,        78,     7,      20,     17,     19,	(u8*)NULL,					0xdead000B,						"PADRead D",					2,		0 },
 
-};
+};	
 
 FuncPattern CPatterns[] =
 {
@@ -485,6 +485,7 @@ void DoCardPatches( char *ptr, u32 size, u32 SectionOffset )
 	}
 
 	return;
+
 }
 void DoPatches( char *ptr, u32 size, u32 SectionOffset )
 {
@@ -517,9 +518,11 @@ void DoPatches( char *ptr, u32 size, u32 SectionOffset )
 		write32(0x00003194, 0x48000028);
 	}
 	
+
 	// Reset Found
 	for( k=0; k < sizeof(FPatterns)/sizeof(FuncPattern); ++k )
-		FPatterns[k].Found = 0;	
+		FPatterns[k].Found = 0;
+	
 	
 	if( ConfigGetConfig(DML_CFG_NMM) )
 		DoCardPatches( ptr, size, SectionOffset );
@@ -643,14 +646,14 @@ void DoPatches( char *ptr, u32 size, u32 SectionOffset )
 
 				u32 DBGSize;
 	
-				//if( ConfigGetConfig( DML_CFG_DEBUGGER ) )
-				//{
+				if( ConfigGetConfig( DML_CFG_DEBUGGER ) )
+				{
 					memcpy( (void*)0x1800, kenobigcDBG, sizeof(kenobigcDBG) );
 					DBGSize = sizeof(kenobigcDBG);
-				//} else {
-				//	memcpy( (void*)0x1800, kenobigc, sizeof(kenobigc) );
-				//	DBGSize = sizeof(kenobigc);
-				//}					
+				} else {
+					memcpy( (void*)0x1800, kenobigc, sizeof(kenobigc) );
+					DBGSize = sizeof(kenobigc);
+				}					
 
 				if( ConfigGetConfig(DML_CFG_DEBUGWAIT) )
 					write32( P2C(read32(0x1808)), 1 );

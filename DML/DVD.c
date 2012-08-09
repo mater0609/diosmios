@@ -6,11 +6,6 @@ static char GamePath[256];
 
 extern FIL GameFile;
 extern u32 FSTMode;
-extern u32 DOLMaxOff;
-extern u32 DOLOffset;
-
-u8 HardDriveConnected;
-FATFS fatfs;
 
 static u8 *FSTable ALIGNED(32);
 u32 ApploaderSize=0;
@@ -22,62 +17,6 @@ u32 FCEntry=0;
 FileCache FC[FILECACHE_MAX];
 u32 FCState[FILECACHE_MAX];
 
-void DVDInit( void )
-{
-	int i=0;
-	s32 fres = FR_DISK_ERR;
-	int MountFail=0;
-	HardDriveConnected = 0;
-
-	while(!HardDriveConnected)
-	{
-		while(1)
-		{
-			fres = f_mount(0, &fatfs );
-			dbgprintf( "DIP:f_mount():%d\n", fres );
-			if( fres == FR_OK )
-				break;
-			else
-				MountFail++;
-
-			if( MountFail == 10 )
-			{
-				dbgprintf( "DIP:too much fail! looping now!\n");
-				while(1);
-			}
-
-			udelay(500000);
-		}
-
-		//try to open a file, it doesn't have to exist, just testing if FS works
-		FIL f;
-		fres = f_open( &f, "/randmb.in", FA_READ|FA_OPEN_EXISTING );
-		switch(fres)
-		{
-			case FR_OK:
-				f_close( &f );
-			case FR_NO_PATH:
-			case FR_NO_FILE:
-			{
-				HardDriveConnected = 1;
-				fres = FR_OK;
-			} break;
-			default:
-			case FR_DISK_ERR:
-			{
-				dbgprintf( "DIP: Disk error\n", fres );
-				while(1);
-			} break;
-		}
-	}
-
-	if( fres != FR_OK )
-	{
-		dbgprintf( "Could not find any USB device!");
-	}
-
-	return;
-}
 s32 DVDSelectGame( void )
 {
 	char *str  = (char*)malloca( 256, 32 );

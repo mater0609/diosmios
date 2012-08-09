@@ -1,6 +1,6 @@
-include starlet.mk
+include ../starlet.mk
 
-CFLAGS += -fpic -fno-builtin-memcpy
+CFLAGS += -fpic
 LDSCRIPT = stub.ld
 LIBS = -lgcc
 
@@ -8,7 +8,7 @@ TARGET = elfloader.elf
 TARGET_BIN = elfloader.bin
 OBJS = start.o stub.o string.o utils.o
 
-include common.mk
+include ../common.mk
 
 all: $(TARGET_BIN)
 
