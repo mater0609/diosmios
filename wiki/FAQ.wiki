@@ -45,6 +45,7 @@ GCLoader got incorrect data when reading from the ISO
 This means DM was unable to mount the selected ISO for whatever reason.
  * Verify that your dump is ok, just google for the md5 hash.
  * Try to install the game again (delete the old folder before)
+ * Your loader is using an incorrect config version
 
 [http://det1re.de/a/sneek/sneek_div.png]
 = I get "Fatal error entrypoint is not within MEM1!" =
