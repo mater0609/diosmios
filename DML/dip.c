@@ -155,7 +155,8 @@ u32 DIUpdateRegisters( void )
 						switch( Offset )
 						{
 							case 0x56B8E7E0:	// AppSwitcher	[EUR]
-							case 0x56C49600:	// [USA]
+							case 0x56C49600:	// [USA] v1.1
+							case 0x56C4C980:	// [USA] v1.0
 							{
 								DMLCfg->Config &= ~(DML_CFG_CHEATS|DML_CFG_PADHOOK|DML_CFG_DEBUGGER|DML_CFG_DEBUGWAIT);
 
@@ -163,7 +164,8 @@ u32 DIUpdateRegisters( void )
 
 							} break;
 							case 0x5668FE20:	// psov3.dol [EUR]
-							case 0x56750660:	// [USA]
+							case 0x56750660:	// [USA] v1.1
+							case 0x56753EC0:	// [USA] v1.0
 							{
 								PSOHack = 1;
 							} break;

@@ -2,7 +2,11 @@
 #define __BSDTYPES_H__
 
 #include "global.h"
-#include "errno.h"
+
+#define ENXIO           6
+#define EINVAL          22
+#define WSAETIMEDOUT    10060L
+#define ETIMEDOUT		WSAETIMEDOUT
 
 typedef u32 u_int;
 //typedef u32 u_int32_t;

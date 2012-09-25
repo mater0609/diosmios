@@ -1,12 +1,16 @@
 #include "Card.h"
 
 FIL CardStat;
+extern u32 FSTMode;
+extern FIL GameFile;
 
 void CardInit( void )
 {
 	FILINFO f;
 	u32 i,wrote;
 	CARDStat CStat;
+	char GameID[0x20];
+	
 
 	memset32( (void*)CARD_BASE, 0xdeadbeef, 0x20 );
 	memset32( (void*)CARD_SHADOW, 0, 0x20 );
@@ -18,10 +22,20 @@ void CardInit( void )
 		f_chdir("/saves");
 	}
 
-	if( f_chdir((const TCHAR*)0) != FR_OK )
+	if( FSTMode )
 	{
-		f_mkdir((const TCHAR*)0);
-		f_chdir((const TCHAR*)0);
+		FSTRead( (char*)GameID, 0x20, 0 );
+
+	} else {						
+
+		f_lseek( &GameFile, 0 );
+		f_read( &GameFile, (char*)GameID, 0x20, &wrote );
+	}
+
+	if( f_chdir(GameID) != FR_OK )
+	{
+		f_mkdir(GameID);
+		f_chdir(GameID);
 	}	
 
 	switch( f_stat( "stats.bin", &f ) )
@@ -89,8 +103,8 @@ s32 CardFindEntryByName( char *Filename )
 	{
 		f_lseek( &CardStat, sizeof(CARDStat) * i );
 		f_read( &CardStat, &CStat, sizeof(CARDStat), &read );
-		
-		if( memcmp( Filename, CStat.fileName, strlen(Filename) ) == 0 )
+				
+		if( strcmp( Filename, CStat.fileName ) == 0 )
 		{
 			//dbgprintf("CardFindEntryByName(%d,%s,%s)\n", i, Filename, CStat.fileName );
 			return i;
