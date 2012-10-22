@@ -1,2 +1,2 @@
 #labels Featured
-<wiki:gadget url="http://crediar.no-ip.com/down.xml" width="100%" height="800" up_projectName="diosmioslite"/>
+<wiki:gadget url="http://crediar.no-ip.com/down.xml" width="100%" height="400" up_projectName="diosmioslite"/>
