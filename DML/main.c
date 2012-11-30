@@ -22,6 +22,8 @@ Copyright (C) 2010-2012  crediar
 #include "dip.h"
 #include "Patches.h"
 
+extern u32 DiscChangeIRQ;
+
 char __aeabi_unwind_cpp_pr0[0];
 
 void Syscall( u32 a, u32 b, u32 c, u32 d )
@@ -113,7 +115,6 @@ void SysShutdown( void )
 }
 
 u32 fail;
-FIL Log;
 
 int main( int argc, char *argv[] )
 {
@@ -237,6 +238,27 @@ int main( int argc, char *argv[] )
 			}
 		} else {
 			PADLock = 0;
+		}
+
+		if( DiscChangeIRQ )
+		if( read32(HW_TIMER) * 128 / 243000000 > 2 )
+		{
+		//	dbgprintf("DIP:IRQ mon!\n");
+
+			//DVDGetDriveStatus
+			//write32( 0x01576D4, 0x38600000 );
+
+			while( read32(DI_SCONTROL) & 1 )
+				clear32( DI_SCONTROL, 1 );
+
+			set32( DI_SSTATUS, 0x3A );
+
+			write32( 0x0d80000C, (1<<0) | (1<<4) );
+			write32( HW_PPCIRQFLAG, read32(HW_PPCIRQFLAG) );
+			write32( HW_ARMIRQFLAG, read32(HW_ARMIRQFLAG) );
+			set32( 0x0d80000C, (1<<2) );
+
+			DiscChangeIRQ = 0;
 		}
 
 		if( (((read32(0x12FC) >> 16) & 0x1030) == 0x1030 ) )

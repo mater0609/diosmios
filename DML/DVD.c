@@ -20,13 +20,14 @@ u32 FCState[FILECACHE_MAX];
 s32 DVDSelectGame( void )
 {
 	char *str  = (char*)malloca( 256, 32 );
+	u32 i=0;
 
 	if( ConfigGetConfig(DML_CFG_GAME_PATH) )
 	{
 		sprintf( str, "%s", ConfigGetGamePath() );
 
 	} else {
-		dbgprintf("No game path was supplied!\n");
+		dbgprintf("DIP:No game path was supplied!\n");
 		free(str);
 		return -1;
 	}
@@ -39,13 +40,40 @@ s32 DVDSelectGame( void )
 		//Try to switch to FST mode
 		if( !FSTInit() )
 		{
-			dbgprintf("Failed to open:\"%s\" fres:%d\n", str, fres );
+			dbgprintf("DIP:Failed to open:\"%s\" fres:%d\n", str, fres );
 			free(str);
 			return -2;
 		}
 
 	} else {
 	
+		f_close( &GameFile );
+
+		dbgprintf("DIP:Current Gamepath:\"%s\"\n", str );
+						
+		//search the string backwards for '/'
+		for( i=strlen(str); i > 0; --i )
+			if( str[i] == '/' )
+				break;
+		i++;
+	
+		if( ConfigGetConfig(DML_CFG_BOOT_DISC2) )
+		{
+			sprintf( str+i, "disc2.iso" );
+		} else {
+			sprintf( str+i, "game.iso" );
+		}
+
+		dbgprintf("DIP:New Gamepath:\"%s\"\n", str );
+	
+		fres = f_open( &GameFile, str, FA_READ );
+		if( fres != FR_OK )
+		{
+			dbgprintf("DIP:Failed to open:\"%s\" fres:%d\n", str, fres );
+			free(str);
+			return -3;
+		}
+
 		f_lseek( &GameFile, 0 );
 		f_read( &GameFile, (void*)0, 0x20, &read );
 
