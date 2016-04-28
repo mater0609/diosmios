@@ -1,0 +1,1 @@
+<wiki:gadget url="http://crediar.no-ip.com/down.xml" width="100%" height="400" up\_projectName="diosmioslite"/>
